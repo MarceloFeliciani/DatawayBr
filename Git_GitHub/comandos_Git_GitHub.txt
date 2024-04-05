@@ -1,0 +1,184 @@
+
+PREPARANDO PARA UM PROJETO
+##########################
+
+GIT e GITHUB
+############
+
+No Git usar uma única vez os comandos abaixo
+############################################
+
+git config --global user.name "Seu Nome"
+git config --global user.email "seu-email@exemple.com"
+
+
+Ciclo de vida do versionamento
+##############################
+
+git init . 							-> cria novo repositório git
+git add <nome arquivo> 				-> manda o arquivo para stage area
+git status							-> mostra o status da branch atual
+git commit -m "minha mensagem"	 	-> consolida o checkpoint "commit"
+git log								-> exibe histórico de commits
+git reset							-> retorna para unstage (retira o que foi adicionado com git add)
+git reset idCommit					-> Retorna para o commit anterior (retira o que foi "comitado" idCommit é o número do commit (pegar com git log))
+git push -u origin main				-> envia para o repositório no GitHub
+git pull origin main 				-> traz os arquivos do repositório para máquina local
+git clone endereço ssh				-> traz todo o repositório para a minha máquina
+
+
+Trabalhando com branchs
+git branch  (lista as branchs existentes)
+git checkout -b dev1 (criará a branch dev1 e colocará como a ativa)
+git checkout dev2 (criará a branch dev2 e NÃO colocará como a ativa)
+
+
+MERGE
+estando na branch main, quero fazer um merge com o dados da branch dev2. Vai mesclar, trazendo todos os arquivos. Os arquivos continuarão existindo na dev2
+
+git merge -m "merge de mudanças de dev2" dev2
+git push origin main
+
+Removendo a branch dev1
+
+git checkout dev1
+git push origin -d dev1  (apagando a branch no repositório do gitHub)
+git checkout main 
+git branch -D dev1  (apaguei localmente. Se não funcionar colocar o D maiúsculo)
+
+
+O git log executado na branch dev1 mostrará todos os commits feitos na main da onde ela veio a partir da onde ela foi criada.
+Se eu fizer um merge para main, aparecerá no git log todos os commits feitos na dev1.
+Se eu usei o merge todos os commits feitos na branch nova aparecerão no log.
+Se não tiver feito merge e mandar o delete, apagará tudo da branch dev1.
+Se fizer o merge e tudo da branch dev1 estiver na main, remover a dev1 é uma boa prática.
+
+git push origin main (enviará o que foi feito commit para o repositório na branch main)
+git push origin dev1 (criará automaticamente a nova branch e enviará os arquivos que foram feito commit nela)
+
+
+tudo está dentro da pasta .git
+Se mover o pasta com os arquivos, devemos levar junto o .git que contém todo o versionamento de código e continuará funcionando no novo local.
+
+No github posso clicar em branch main e clicar em COMPARE & PULL REQUEST ou na aba PULL REQUESTS para branch main receber o que está na branch dev1
+Observer a seta que está mostrando o sentido 
+Colocar um título
+Colocar uma descrição: "Este é um merge para criar o arquivo X na branch main"
+Posso colocar pessoas para revisarem  o PULL REQUESTES clicando em REVIEWERS
+Create PULL REQUESTS
+Na aba files changed apararecem todas as linhas dos arquivos que sofreram alterações
+Posso adicionar uma regra que uma pessoa específica aprove o merge
+O PULL REQUEST é o momento  da equipe discutir se o que será feito MERGE está correto e pode ir para produção
+Clicando em MERGE PULL REQUESTS enviará o arquivo X para a branch main.
+
+fazer um git pull na main do meu git local para trazer as atualizações do repositório main
+
+git checkout main
+git pull origin main   (atualizará o git local com o que está atualizado no repositório
+
+CICLO DE DESENVOLVIMENTO
+########################
+- Fazer um git pull da branch main do repositório do github para a branch main do git local
+- Fazer um git checkout -b nova_branch para trabalhar nos arquivos adicionando novas funcionalidades
+- Fazer um git push origin nova_branch para criar a nova_branch no repositório e enviar os arquivos para lá
+- Fazer um PULL REQUEST no repositório do Gihub para atualizar a branch main do repositório
+
+Sempre subir numa branch separada e pedir permissão para fazer o merge para a main.
+
+NUNCA TRABALHAR diretamente na branch de um colega. Fazer um git pull para minha máquina ou git clone.
+
+git clone (traz todo repositório para a máquina)
+git pull (traz somente as alterações feitas no repositório para o git local)
+
+
+Sempre que for fazer o git clone pegar o endereço ssh.
+
+
+
+FORK
+####
+
+Entrar em um repositório que eu deseje fazer um fork.
+Clicar em fork
+Colocar meu nome no fork e colocar um nome no Repository Name
+Clicar em fork
+Estou pegando o projeto inteiro e trazendo para o meu GITHUB
+
+No Repositorio do meu GITHUB
+Clicar em code
+Selecionar o endereço ssh
+Criar uma pasta local no meu computador e fazer git clone com o endereço ssh
+Entrar na pasta do meu computador que foi clonada do Github do fork do meu repositório
+Criar nova branch para trabalhar nas alterações (git checkout -b develop) será criada e colocada com a ativa
+git branch para confirmar as branchs existentes e qual está ativa
+Criar os arquivos na branch develop
+git add colocar os arquivos
+git commit -m "Enviando os arquivos alterados"
+git push origin develop (será criada a branch develop e enviará os arquivos para lá)
+
+IMPORTANTE
+##########
+No Repositório do Gihub
+COMPARE & PULL REQUEST
+CREATE PULL REQUEST (será enviado o pull para o repositório de onde eu fiz o fork para o "dono" aceitar e fazer o merge no código dele)
+aparecerão os novos arquivos no repitório dele
+
+No meu repositório onde foi feito o fork não tem os arquivos enviados para o dono repositório da onde foi feito o fork inicial
+Clicar em SYNC FORK
+UPDATE BRANCH (receberá os arquivos que estão no repositório do dono)
+
+No computador dar um git pull para atualizar com os arquivos do git hub.
+
+BRANCH é um nível de isolamento no próprio repositório
+FORK é um nível de isolamento no repositório original
+
+
+
+criando ssh
+ssh-keygen -t rsa (dar enter e não colocar nada)
+cat ~/.ssh/id_rsa.pub (copiar todo o conteúdo para colocar no github e fazer a autenticação ssh automaticamente)
+
+
+
+CRIEI A CHAVE ABAIXO NO LINUX E INSERI NO GITHUB PARA FAZER A AUTENTICAÇÃO SSH
+##############################################################################
+
+feliciani@LAPTOP-V176DRSL:~/ambientes/JupyterLab/projetos/TeoCalvo/git-github$ ssh-keygen -t ed25519 -C "marcelo.feliciani@gmail.com"
+
+feliciani@LAPTOP-V176DRSL:~/ambientes/JupyterLab/projetos/TeoCalvo/git-github$ ssh-add ~/.ssh/id_ed25519
+
+feliciani@LAPTOP-V176DRSL:~/ambientes/JupyterLab/projetos/TeoCalvo/git-github$ ssh-keygen -t ed25519-sk -C "marcelo.feliciani@gmail.com"
+
+feliciani@LAPTOP-V176DRSL:~/ambientes/JupyterLab/projetos/TeoCalvo/git-github$ cat ~/.ssh/id_ed25519.pub
+
+
+ENTRAR NO GITHUB E COLOCAR A CHAVE SSH CRIADA NO LINUX DA MINHA MÁQUINA
+#######################################################################
+
+Logar com meu usuário no gituhub
+
+configurações -> SSH and GPG Keys -> New SSH Key (adicionar a chave gerada)
+
+
+Criei repositório e usei os comandos abaixo com sucesso, após adicinada a chave SSH
+###################################################################################
+
+echo "# JornadaDados" >> README.md
+git init
+git add README.md
+git commit -m "first commit"
+git branch -M main
+git remote add origin git@github.com:MarceloFeliciani/JornadaDados.git
+git push -u origin main
+
+
+######################################################################################################################
+
+Outra forma de criar um repositório para versionamento no GITHUB
+
+- Criar um repositório novo e fazer um clone dele para o git local
+- Entrar na pasta desejada no linux e fazer um 
+git clone (endereço ssh do repositório criado)
+
+######################################################################################################################
+
