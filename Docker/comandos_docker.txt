@@ -1,0 +1,650 @@
+https://github.com/matheusbattisti/curso_docker
+
+DockerFile cria uma imagem. A imagem executará um container contendo a aplicação.
+
+O CONTAINER roda as instruções propostas pela imagem.
+Programamos uma imagem e executamos ela num container.
+
+Uma IMAGEM pode ser iniciada com base em outra imagem
+
+Guia para problemas de instalação
+https://docs.docker.com/get-docker/
+
+Encontramos imagens no Docker HUB
+https://hub.docker.com
+
+
+COMANDOS
+########
+
+docker version
+
+docker ps ################## mostra os container ativos
+
+docker run <nome da imagem> ##################### se não tiver "baixada" ele fará o download da imagem
+
+docker container ls ################## mostra os container ativos
+
+docker ps -a ################## mostra os container que foram executados
+
+docker container ls -a ################## mostra os container que foram executados
+
+docker run -it <nome da imagem> ######################### entro na imagem para executar comandos, por exemplo  docker run -it ubuntu
+
+docker run -it node ##################### -it é pra mim entrar no node para executar comandos. Caso, eu não tiver baixado ele fará download
+
+docker logs <ID Container> ########################## Verificar o quê aconteceu com o container 
+
+docker run -d nginx ############# -d deixa o container rodando em background e o terminal fica liberado para uso, fará download se não tiver sido "baixado"
+
+docker inspect <nome conteiner> ########### verificar a configuração de rede de um container
+
+docker stop <nome container ou ID container> ############### parar o container
+
+docker rm <ID container> ########################## Remover um container
+docker rm confident_rhodes
+
+docker rm <ID container> -f ########################## Remover um container com FORCE
+docker rm confident_rhodes -f
+
+
+## o container não tem conexão com nada fora deles, devemos expor uma porta para conectar no destino
+## -p 80:80 expondo a porta 80 do container com a porta 80 do terminal. Temos que usar o -p
+docker run -d -p 80:80 nginx ##################### colocando o container nginx para rodar em background expondo a porta 80 do container com a porta 80 do localhost
+#### http://localhost:80
+
+
+docker run -d -p 3000:80 nginx ################### digitarei no navegador localhost:3000 para acessar o conteúdo do nginx
+e o nginx ficará "amarado" nessa porta
+
+docker ps
+
+docker stop 0a687fa955f9
+
+docker ps
+
+docker start <nome do container ou ID container> ####################################################### iniciará o conteiner
+
+######### RUN cria um container NOVO
+######### START inicia um container existente
+docker start 0a687fa955f9
+docker stop 0a687fa955f9
+
+
+docker run -d -p 80:80 --name nginx_app nginx  ########################################################### dando nome ao container
+
+
+docker ps
+CONTAINER ID   IMAGE     COMMAND                  CREATED          STATUS          PORTS                NAMES
+dd1171f190d0   nginx     "/docker-entrypoint.…"   33 seconds ago   Up 26 seconds   0.0.0.0:80->80/tcp   nginx_app
+
+docker stop nginx_app
+nginx_app
+
+docker logs <ID Container> ########################## Verificar o quê aconteceu com o container 
+docker logs nginx_app
+
+docker rm <ID container> ########################## Remover um container
+docker rm confident_rhodes
+
+docker rm <ID container> -f ########################## Remover um container com FORCE
+docker rm confident_rhodes -f
+
+#######
+IMAGENS
+#######
+São programadas por alguém e serão criadas a partir do dockerfile
+Podem conter:
+- imagem base
+- diretório base
+- comandos a serem executados
+- porta da aplicação
+- etc...
+
+
+BAIXANDO UMA IMAGEM CONFIÁVEL
+#############################
+##Baixando a imagem do Apache HTTP diretamente do Hub Docker em background (-d) e setando a porta 80 do container e porta 80 do localhost além de dar o nome meu_apache
+docker run -d -p 80:80 --name meu_apache http 
+- ver se é oficial
+- ver se tem milhões de downloads realizados
+- ver quantas Stars a imagem recebeu
+
+
+CRIANDO UMA IMAGEM
+###################
+- Criar Dockerfile na pasta onde está o projeto
+* Instruções para o arquivo Dockerfile (USAR O D MAIÚSCULO, É UMA BOA PRÁTICA!)
+FROM: imagem base
+WORKDIR: diretório de execução da aplicação
+EXPOSE: porta da aplicação
+COPY: quais arquivos precisam ser copiados
+
+Por exemplo de Dockerfile
+#########################
+
+docker pull - pegar uma imagem pronta
+docker images - ver as imagens que tem no computador
+docker build - criar imagens a partir do dockerfile
+docker ps - ver os containers que estão ativos
+docker run - executar um container
+
+
+# usará a imagem python como base
+FROM python:3.11
+
+# Criará e definiraá o diretório de trabalho
+WORKDIR /usr/src/app
+
+# Copiará o arquivo requerements.txt contendo os requisitos para dentro do diretório de trabalho
+COPY requerements.txt ./
+
+# Instalará as dependências de forma recursiva. Instalará uma biblioteca de cada vez
+RUN pip install --no-cache-dir -r requerements.txt 
+
+# Copiará o código fonte da aplicação para o diretório de trabalho
+COPY . .
+
+# Vai expor a porta 5000 para ser acessada externamente
+EXPOSE 5000
+
+# Comando para iniciar a apliacação
+CMD ["python", "app.py"]
+
+# o dockerfile será usado para criar uma imagem, e essa imagem será colocada em execução para subir um container com a aplicação.
+
+
+# docker build .  ## cria a imagem no diretório de trabalho. Cria as camadas do Dockerfile acima para ser executada em um container.
+# cria em cache. Se alterar algo, aquilo que estiver em cache não necessitará ser executado.
+
+feliciani@LAPTOP-V176DRSL:~/ambientes/JupyterLab/projetos/Dataway/mentoria/Docker$ docker build -t hello-dataway .
+
+-t é para colocar um título
+. indica que o dockerfile está na pasta corrente
+
+docker image ls  #################### mostra todas as imagens, incluindo a nova
+
+docker run -d -p 5000:5000 hello-dataway #################### executará a imagem no container hello-dataway na porta localhost:5000
+
+# 5000:5000 - conexão da porta 5000 do container com a porta 5000 do sistema operacional da minha máquina
+# quando acessar o http://localhost:5000   estará acessando a porta 5000 do container.
+
+SEMPRE QUE FIZER UMA ALTERAÇÃO NA IMAGEM DEVE-SE RODAR O docker build .    
+SERÁ UMA NOVA IMAGEM
+
+docker pull <imagem> ################ faz o download da imagem 
+docker pull python
+docker run -it python
+
+
+docker run --help  ######################## help após um comando, retornará ajuda
+
+
+Rodando vários containers ao mesmo tempo com a mesma imagem. Trocando apenas a porta do container
+##################################################################################################
+docker run -d -p 3000:3000 --name meu_node2 be6b802c331
+
+docker run -d -p 4000:3000 --name meu_node3 be6b802c331
+
+docker run -d -p 5000:3000 --name meu_node4 be6b802c331
+
+
+Alterando o nome e a tag da imagem
+##################################
+docker tag be6b802c331 minha_imagem  ################# altera o nome ficando na coluna do REPOSITORY
+
+docker tag be6b802c331 minha_imagem:minha_imagem ############ altera o nome e a tag, ficando nas colunas REPITORY E TAG
+
+docker pull minha_imagem:minha_imagem ################## Como se eu fosse baixar a imagem
+
+
+Iniciando imagem com um nome
+############################
+
+docker build -t meunode_novo .   ################### criando uma imagem com os arquivos do diretório com o nome meunode_novo
+
+
+Comando START INTERATIVO
+########################
+
+docker start -i meunode_novo
+
+docker stop meunode_novo
+
+Removendo imagens
+#################
+docker rmi be6b802c331 ########### colocar o ID
+
+docker rmi -f be6b802c331 ########### colocar o ID.   -f força a remoção
+
+docker rmi minha_imagem:minha_imagem
+
+Removendo imagens / containers / networks não utilizados
+########################################################
+docker system prune ##################### pede confirmação
+docker system prune
+WARNING! This will remove:
+  - all stopped containers
+  - all networks not used by at least one container
+  - all dangling images
+  - all dangling build cache
+
+Are you sure you want to continue? [y/N] Y
+
+
+
+Removendo container após utilizar. Ganhar espaço em disco
+#########################################################
+docker run --rm <container>
+docker run -d -p 3000:3000 --name meu_nginx --rm nginx ################ nginx é uma imagem que já exite
+
+
+Copiando arquivos entre container
+Criei o container node_diferente2 a partir do meunode.
+Surgiu a necessidade de copiar um arquivo do container node_diferente2 que está rodando para a pasta copia
+##########################################################################################################
+docker run -d -p 3000:3000 --name node_diferente2 meunode
+
+docker cp node_diferente2:/app/app.js ./copia/
+
+
+Verificar informações de processamento
+######################################
+docker ps
+CONTAINER ID   IMAGE     COMMAND                  CREATED          STATUS          PORTS                            NAMES
+ae7196140e6b   nginx     "/docker-entrypoint.…"   12 minutes ago   Up 12 minutes   80/tcp, 0.0.0.0:3000->3000/tcp   meu_nginx
+
+
+docker top meu_nginx
+UID                 PID                 PPID                C                   STIME               TTY                 TIME                CMD
+root                1262                1242                0                   13:33               ?                   00:00:00            nginx: master process nginx -g daemon off;
+uuidd               1321                1262                0                   13:33               ?                   00:00:00            nginx: worker process
+
+
+
+
+Verificando dados do Container id, data de criação, imagem e muito mais
+#######################################################################
+docker inspect meu_nginx
+[
+    {
+        "Id": "ae7196140e6bad4a33d61aca89141f6d87eac4bc1250a3266a541d9b481c4df2",
+        "Created": "2021-04-12T13:32:41.4888178Z",
+        "Path": "/docker-entrypoint.sh",
+        "Args": [
+            "nginx",
+            "-g",
+            "daemon off;"
+        ],
+        "State": {
+            "Status": "running",
+            "Running": true,
+            "Paused": false,
+            "Restarting": false,
+            "OOMKilled": false,
+            "Dead": false,
+            "Pid": 1262,
+            "ExitCode": 0,
+            "Error": "",
+            "StartedAt": "2021-04-12T13:33:10.6604143Z",
+            "FinishedAt": "0001-01-01T00:00:00Z"
+        },
+        "Image": "sha256:7ce4f91ef623b9672ec12302c4a710629cd542617c1ebc616a48d06e2a84656a",
+        "ResolvConfPath": "/var/lib/docker/containers/ae7196140e6bad4a33d61aca89141f6d87eac4bc1250a3266a541d9b481c4df2/resolv.conf",
+        "HostnamePath": "/var/lib/docker/containers/ae7196140e6bad4a33d61aca89141f6d87eac4bc1250a3266a541d9b481c4df2/hostname",
+        "HostsPath": "/var/lib/docker/containers/ae7196140e6bad4a33d61aca89141f6d87eac4bc1250a3266a541d9b481c4df2/hosts",
+        "LogPath": "/var/lib/docker/containers/ae7196140e6bad4a33d61aca89141f6d87eac4bc1250a3266a541d9b481c4df2/ae7196140e6bad4a33d61aca89141f6d87eac4bc1250a3266a541d9b481c4df2-json.log",
+        "Name": "/meu_nginx",
+        "RestartCount": 0,
+        "Driver": "overlay2",
+        "Platform": "linux",
+        "MountLabel": "",
+        "ProcessLabel": "",
+        "AppArmorProfile": "",
+        "ExecIDs": null,
+        "HostConfig": {
+            "Binds": null,
+            "ContainerIDFile": "",
+            "LogConfig": {
+                "Type": "json-file",
+                "Config": {}
+            },
+            "NetworkMode": "default",
+            "PortBindings": {
+                "3000/tcp": [
+                    {
+                        "HostIp": "",
+                        "HostPort": "3000"
+                    }
+                ]
+            },
+            "RestartPolicy": {
+                "Name": "no",
+                "MaximumRetryCount": 0
+            },
+            "AutoRemove": true,
+            "VolumeDriver": "",
+            "VolumesFrom": null,
+            "CapAdd": null,
+            "CapDrop": null,
+            "CgroupnsMode": "host",
+            "Dns": [],
+            "DnsOptions": [],
+            "DnsSearch": [],
+            "ExtraHosts": null,
+            "GroupAdd": null,
+            "IpcMode": "private",
+            "Cgroup": "",
+            "Links": null,
+            "OomScoreAdj": 0,
+            "PidMode": "",
+            "Privileged": false,
+            "PublishAllPorts": false,
+            "ReadonlyRootfs": false,
+            "SecurityOpt": null,
+            "UTSMode": "",
+            "UsernsMode": "",
+            "ShmSize": 67108864,
+            "Runtime": "runc",
+            "ConsoleSize": [
+                23,
+                153
+            ],
+            "Isolation": "",
+            "CpuShares": 0,
+            "Memory": 0,
+            "NanoCpus": 0,
+            "CgroupParent": "",
+            "BlkioWeight": 0,
+            "BlkioWeightDevice": [],
+            "BlkioDeviceReadBps": null,
+            "BlkioDeviceWriteBps": null,
+            "BlkioDeviceReadIOps": null,
+            "BlkioDeviceWriteIOps": null,
+            "CpuPeriod": 0,
+            "CpuQuota": 0,
+            "CpuRealtimePeriod": 0,
+            "CpuRealtimeRuntime": 0,
+            "CpusetCpus": "",
+            "CpusetMems": "",
+            "Devices": [],
+            "DeviceCgroupRules": null,
+            "DeviceRequests": null,
+            "KernelMemory": 0,
+            "KernelMemoryTCP": 0,
+            "MemoryReservation": 0,
+            "MemorySwap": 0,
+            "MemorySwappiness": null,
+            "OomKillDisable": false,
+            "PidsLimit": null,
+            "Ulimits": null,
+            "CpuCount": 0,
+            "CpuPercent": 0,
+            "IOMaximumIOps": 0,
+            "IOMaximumBandwidth": 0,
+            "MaskedPaths": [
+                "/proc/asound",
+                "/proc/acpi",
+                "/proc/kcore",
+                "/proc/keys",
+                "/proc/latency_stats",
+                "/proc/timer_list",
+                "/proc/timer_stats",
+                "/proc/sched_debug",
+                "/proc/scsi",
+                "/sys/firmware"
+            ],
+            "ReadonlyPaths": [
+                "/proc/bus",
+                "/proc/fs",
+                "/proc/irq",
+                "/proc/sys",
+                "/proc/sysrq-trigger"
+            ]
+        },
+        "GraphDriver": {
+            "Data": {
+                "LowerDir": "/var/lib/docker/overlay2/c43a17e8fdff7b19812e97b29d407e4e1716474ce5c361d0b9306061eab77c5a-init/diff:/var/lib/docker/overlay2/4242c585543463c618c6e917d99a074b188bc8e751a65207697410335b683e50/diff:/var/lib/docker/overlay2/a705a1a3cb9d87fb3f21de0034a9771776035877232971f3207aaf255fd4d541/diff:/var/lib/docker/overlay2/2bb8e83c3e6a20cc0f9908ec579a9950bf3fefdd58571352f2ec16d0c3544a9e/diff:/var/lib/docker/overlay2/d5c9ad233f24cb2b83398fa8905a2f03d8b823601fc63f1747a993c9d27adb3e/diff:/var/lib/docker/overlay2/fd8f6817a51dc8be27506adcad6c897167e69c281496daa72227fa3f79469eff/diff:/var/lib/docker/overlay2/fb68f0fee0e910060c1bb4d23f5eee70e731e7e716778689bcc83e5f53847308/diff",
+                "MergedDir": "/var/lib/docker/overlay2/c43a17e8fdff7b19812e97b29d407e4e1716474ce5c361d0b9306061eab77c5a/merged",
+                "UpperDir": "/var/lib/docker/overlay2/c43a17e8fdff7b19812e97b29d407e4e1716474ce5c361d0b9306061eab77c5a/diff",
+                "WorkDir": "/var/lib/docker/overlay2/c43a17e8fdff7b19812e97b29d407e4e1716474ce5c361d0b9306061eab77c5a/work"
+            },
+            "Name": "overlay2"
+        },
+        "Mounts": [],
+        "Config": {
+            "Hostname": "ae7196140e6b",
+            "Domainname": "",
+            "User": "",
+            "AttachStdin": false,
+            "AttachStdout": false,
+            "AttachStderr": false,
+            "ExposedPorts": {
+                "3000/tcp": {},
+                "80/tcp": {}
+            },
+            "Tty": false,
+            "OpenStdin": false,
+            "StdinOnce": false,
+            "Env": [
+                "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+                "NGINX_VERSION=1.19.9",
+                "NJS_VERSION=0.5.3",
+                "PKG_RELEASE=1~buster"
+            ],
+            "Cmd": [
+                "nginx",
+                "-g",
+                "daemon off;"
+            ],
+            "Image": "nginx",
+            "Volumes": null,
+            "WorkingDir": "",
+            "Entrypoint": [
+                "/docker-entrypoint.sh"
+            ],
+            "OnBuild": null,
+            "Labels": {
+                "maintainer": "NGINX Docker Maintainers \u003cdocker-maint@nginx.com\u003e"
+            },
+            "StopSignal": "SIGQUIT"
+        },
+        "NetworkSettings": {
+            "Bridge": "",
+            "SandboxID": "e9e4151f3c6e62432519058b21c40326e1d7392ee3a1bb24eee1af0f0bf2cb0f",
+            "HairpinMode": false,
+            "LinkLocalIPv6Address": "",
+            "LinkLocalIPv6PrefixLen": 0,
+            "Ports": {
+                "3000/tcp": [
+                    {
+                        "HostIp": "0.0.0.0",
+                        "HostPort": "3000"
+                    }
+                ],
+                "80/tcp": null
+            },
+            "SandboxKey": "/var/run/docker/netns/e9e4151f3c6e",
+            "SecondaryIPAddresses": null,
+            "SecondaryIPv6Addresses": null,
+            "EndpointID": "d1f80fd7fbb2cf4c3cbb08a5e465c45b808989cd49122cedd95f239868f9ffe7",
+            "Gateway": "172.17.0.1",
+            "GlobalIPv6Address": "",
+            "GlobalIPv6PrefixLen": 0,
+            "IPAddress": "172.17.0.2",
+            "IPPrefixLen": 16,
+            "IPv6Gateway": "",
+            "MacAddress": "02:42:ac:11:00:02",
+            "Networks": {
+                "bridge": {
+                    "IPAMConfig": null,
+                    "Links": null,
+                    "Aliases": null,
+                    "NetworkID": "e05481ae481b39ebb40c9cec8b2a688aa3571cb30b032954743b4521482ce887",
+                    "EndpointID": "d1f80fd7fbb2cf4c3cbb08a5e465c45b808989cd49122cedd95f239868f9ffe7",
+                    "Gateway": "172.17.0.1",
+                    "IPAddress": "172.17.0.2",
+                    "IPPrefixLen": 16,
+                    "IPv6Gateway": "",
+                    "GlobalIPv6Address": "",
+                    "GlobalIPv6PrefixLen": 0,
+                    "MacAddress": "02:42:ac:11:00:02",
+                    "DriverOpts": null
+                }
+            }
+        }
+    }
+]
+
+
+
+Verificar o processamento geral do computador com os containers. Fica monitorando e atualizando o consumo de recursos
+#######################################################################################################################
+docker ps
+CONTAINER ID   IMAGE     COMMAND                  CREATED          STATUS          PORTS                            NAMES
+ae7196140e6b   nginx     "/docker-entrypoint.…"   35 minutes ago   Up 35 minutes   80/tcp, 0.0.0.0:3000->3000/tcp   meu_nginx
+
+docker stats
+CONTAINER ID   NAME        CPU %     MEM USAGE / LIMIT     MEM %     NET I/O           BLOCK I/O   PIDS
+ae7196140e6b   meu_nginx   0.00%     3.227MiB / 6.099GiB   0.05%     2.54kB / 1.01kB   0B / 0B     2
+
+
+Autenticação no Docker Hub
+##########################
+docker login
+Authenticating with existing credentials...
+Login Succeeded
+
+Encerrando a Autenticação no Docker Hub
+#######################################
+ docker logout
+Removing login credentials for https://index.docker.io/v1/
+
+
+Enviar uma imagem para o Docker Hub   docker push <imagem>
+###################################
+- Criar o REPOSITÓRIO no Docker Hub na minha conta. Posso ter vários públicos, mas somente um privado.
+Por exemplo creie o repositório nodeteste
+
+- docker build -t marcelofeliciani/nodeteste .  ################# criei a imagem do aplicação contida no diretório usando o VSCode
+
+- docker login ################ para conectar no Docker Hub
+
+- docker push marcelofeliciani/nodeteste ################## enviando a imagem criada para o repositorio que foi criado anteriormente
+
+- docker pull marcelofeliciani/nodetete  ####################### faria download da imagem do meu repositório do Docker Hub. Mas, de outro computador por no meu eu já tenho a imagem enviada para o repositório
+
+- docker rmi marcelofeliciani/nodetete ########### posso deletar e aí fazer o teste com o pull.
+
+
+ATUALIZANDO A IMAGEM PARA ENVIAR
+################################
+
+- Fazer a correção necessária
+- criar novo BUILD com a mesma imagem, MAS com uma TAG diferente para essa verão atualizada 
+docker build -t marcelofeliciani/nodeteste:novaversao . ################################################ coloquei a TGA nova versao
+
+- Fazer novo push para o repositório
+docker login
+docker push marcelofeliciani/nodeteste:novaverao  ############################# vai enviar a imagem. Terei 2 imagens no repoitório. Envia apenas o que foi alterado, aquilo que já tinha sido enviado na primeira imagem e que não foi alterado ele nao vai enviar novamente
+
+
+BAIXANDO E UTILIZANDO A IMAGEM 
+##############################
+Não precisa estar logado no docker hub por que é uma imagem pública
+
+docker pull marcelofeliciani/nodeteste:novaverao ####################### faz o download da imagem para uma nova máquina ou caso eu tenho deletado da máquina de origem
+
+docker run --name testando_imagem -p 3000:3000 -d marcelofeliciani/nodeteste:novaversao
+
+acessar no localhot:3000
+
+
+
+
+VOLUMES
+#######
+Salvar dados fora dos containers docker
+
+Se um container é apagado os dados nele contidos nele serão apagados
+
+Os volumes gerenciam os dados e também podemos fazer backups de forma mais simples
+
+TIPOS DE VOLUME
+###############
+
+Anônimos (anonymous)- Diretórios criados pela flag -v, porém com um nome aleatório
+
+Nomeados (named) - são volumes com nomes, poderemos nos referir a estes facilmente e saber para que são utilizados no nosso ambiente
+
+Bind mounts: uma forma de salvar dados na nossa máquina, sem o gerenciamento do Docker, informamos um diretório para este fim
+
+
+FOI CRIADO UMA APLICAÇÃO EM PHP.
+FEITO O BUILD PARA CRIAR UMA IMAGEM COM A APLICAÇÃO
+###################################################
+######### Conteúdo do arquivo Dockerfile contido no diretório da aplicação php para criar a imagem
+
+FROM php:8-apache
+
+WORKDIR /var/www/html/
+
+COPY . .
+
+EXPOSE 80
+
+RUN chrown -R www-data:www-data /var/www   ############ dá permissão de acesso ao diretório
+
+
+
+PS E:\Projetos\DOCKER\criando container php com VOLUME> docker build -t phpmessages . ######################### MANDEI CRIAR A IMAGEM
+[+] Building 19.1s (8/8) FINISHED
+ => [internal] load build definition from Dockerfile                                                                                                1.5s 
+ => => transferring dockerfile: 129B                                                                                                                0.1s 
+ => [internal] load .dockerignore                                                                                                                   1.5s 
+ => => transferring context: 2B                                                                                                                     0.0s 
+ => [internal] load metadata for docker.io/library/php:8-apache                                                                                     5.8s 
+ => CACHED [1/3] FROM docker.io/library/php:8-apache@sha256:52bed532a4cd1d08b1fb12f375d252db268bf1510ca9ac9d8317b5835139b356                        0.1s 
+ => [internal] load build context                                                                                                                   1.0s 
+ => => transferring context: 217B                                                                                                                   0.0s 
+ => [2/3] WORKDIR E:ProjetosDOCKERphp_volume_docker                                                                                                 1.9s 
+ => [3/3] COPY . .                                                                                                                                  1.9s 
+ => exporting to image                                                                                                                              4.3s 
+ => => exporting layers                                                                                                                             2.7s 
+ => => writing image sha256:e82455945d20846c9f1c3fc04e59a7570df7e4f666b350e046ce42cc7910f501                                                        0.1s 
+ => => naming to docker.io/library/phpmessages                                                                                                      0.2s 
+
+
+
+
+PS E:\Projetos\DOCKER\criando container php com VOLUME> docker images ######################################## IMAGEM CRIADA
+REPOSITORY                                      TAG       IMAGE ID       CREATED          SIZE
+phpmessages                                     latest    e82455945d20   53 seconds ago   417MB
+simulator_app                                   latest    b5174e76c6a9   4 days ago       888MB
+nginx                                           latest    7ce4f91ef623   13 days ago      133MB
+jupyter/pyspark-notebook                        latest    97e01b9ce7a5   3 weeks ago      3.39GB
+confluentinc/cp-kafka                           latest    24aaec098df4   3 weeks ago      748MB
+confluentinc/cp-zookeeper                       latest    3ae87a8bfa8d   3 weeks ago      748MB
+docker.elastic.co/elasticsearch/elasticsearch   7.11.2    a6cbb6bace0e   5 weeks ago      824MB
+docker.elastic.co/kibana/kibana                 7.11.2    59ddc19818fe   5 weeks ago      1.01GB
+confluentinc/cp-enterprise-control-center       6.0.1     a594d1370904   4 months ago     973MB
+confluentinc/cp-kafka-connect-base              6.0.0     2662f88d7543   6 months ago     1.17GB
+fjardim/jupyter-spark                           latest    31051dea1e70   8 months ago     5.03GB
+fjardim/datanode                                latest    24fb187ebd91   12 months ago    874MB
+fjardim/namenode_sqoop                          latest    40dc59117765   12 months ago    1.54GB
+fjardim/mysql                                   latest    84164b03fa2e   13 months ago    456MB
+fjardim/hive-metastore                          latest    7ab9e8f93813   13 months ago    275MB
+fjardim/hive                                    latest    87f5c9f4e2df   3 years ago      1.17GB
+fjardim/hbase-master                            latest    ce0efeff9785   3 years ago      1.1GB
+fjardim/zookeeper                               latest    6fe5551964f5   5 years ago      451MB
+
+
+PS E:\Projetos\DOCKER\criando container php com VOLUME> docker run -d -p 80:80 --name phpmessages_container phpmessages  ############ MANDEI RODAR O CONTAINER
+9c57752995162635d7d480bb23ac10df4b2480fc8a9b1098b33972a35534b232
+
+localhost
+
+PS E:\Projetos\DOCKER\criando container php com VOLUME> docker ps
+CONTAINER ID   IMAGE         COMMAND                  CREATED         STATUS          PORTS                NAMES
+9c5775299516   phpmessages   "docker-php-entrypoi…"   4 minutes ago   Up 54 seconds   0.0.0.0:80->80/tcp   phpmessages_container
+
