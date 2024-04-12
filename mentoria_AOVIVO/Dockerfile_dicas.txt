@@ -1,0 +1,10 @@
+Comandos usados
+
+docker build -t datawaybr-jupyterlab .
+
+docker images
+
+docker run -p 8888:8888 datawaybr-jupyterlab
+
+http://localhost:8888
+
